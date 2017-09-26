@@ -1,0 +1,33 @@
+{
+  "name": "swa-cli",
+  "version": "0.1.0",
+  "description": "swa平台的命令行集成工具。",
+  "main": "index.js",
+  "bin": {
+    "swa": "./bin/swa-cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node ./scripts/postinstall.js"
+  },
+  "keywords": [
+    "swa", "fis3"
+  ],
+  "author": {
+    "name": "康永胜",
+    "email": "kys8823@gmail.com"
+  },
+  "config": {
+    "unsafe-perm": true
+  },
+  "license": "MIT",
+  "dependencies": {
+    "liftoff": "^2",
+    "minimist": "^1",
+    "async": "~2",
+    "mkdirp": "~0",
+    "tar": "~2",
+    "fstream": "~1",
+    "opn": "~5"
+  }
+}
