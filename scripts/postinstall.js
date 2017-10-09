@@ -18,50 +18,53 @@ let   npmGlobalDir;
 logger.info(`${self.name} 模块安装成功, 将为您自动安装 ${modulesShouldBeInstalled} 等模块.`);
 
 /*加载npm*/
-promises.push(new Promise((reslove, reject) => {
+(new Promise((reslove, reject) => {
   npm.load({loaded: false, 'global': true}, reslove);
-}));
-
-/*获取全局路径*/
-promises.push(new Promise((reslove, reject) => {
-  npm.commands.root(function(err, data){
-    if (err) {
-      npmGlobalDir = npm.config.get('globalconfig');
-      npmGlobalDir = path.join(npmGlobalDir, '..');
-    }else{
-      npmGlobalDir = data;
+}))
+.then( () => {
+  /*获取全局路径*/
+  return new Promise((reslove, reject) => {
+    npm.commands.root(function(err, data){
+      if (err) {
+        npmGlobalDir = npm.config.get('globalconfig');
+        npmGlobalDir = path.join(npmGlobalDir, '..');
+      }else{
+        npmGlobalDir = data;
+      }
+      logger.info(`npm的全局安装路径为: ${npmGlobalDir}`);
+      reslove();
+    });
+  });
+})
+.then(() => {
+  var promises = [];
+  /*检测应当被全局安装的模块是否全局安装*/
+  modulesShouldBeInstalled.forEach(function(moduleName){
+    promises.push(new Promise((reslove, reject) => {
+      isModuleInstalledGlobally(moduleName, reslove);
+    }));
+  });
+  return Promise.all(promises);
+})
+.then(() => {
+  /*安装依赖模块*/
+  return new Promise((reslove, reject) => {
+    if (modulesNeedInstalling.length <= 0) {
+      reslove();
+      return;
     }
-    logger.info(`npm的全局安装路径为: ${npmGlobalDir}`);
-    reslove();
+    logger.info(`开始安装 ${modulesNeedInstalling} 模块.`);
+    npm.commands.install(modulesNeedInstalling, function (er, data) {
+      if (er) {
+        throw er;
+      }
+      reslove();
+    });
+    npm.on('log', function (message) {
+      logger.info(message);
+    });
   });
-}));
-
-/*检测应当被全局安装的模块是否全局安装*/
-modulesShouldBeInstalled.forEach(function(moduleName){
-  promises.push(new Promise((reslove, reject) => {
-    isModuleInstalledGlobally(moduleName, reslove);
-  }));
-});
-
-/*安装依赖模块*/
-promises.push(new Promise((reslove, reject) => {
-  if (modulesNeedInstalling.length <= 0) {
-    reslove();
-    return;
-  }
-  logger.info(`开始安装 ${modulesNeedInstalling} 模块.`);
-  npm.commands.install(modulesNeedInstalling, function (er, data) {
-    if (er) {
-      throw er;
-    }
-    reslove();
-  });
-  npm.on('log', function (message) {
-    logger.info(message);
-  });
-}));
-
-Promise.all(promises)
+})
 .then(() => {
   logger.info(`${self.name} 模块安装流程完成.`);
 })
