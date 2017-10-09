@@ -5,7 +5,7 @@ const async  = require('async');
 const utils  = require('../lib/utils.js');
 const logger = require('../lib/logger.js');
 const self   = require('../package.json');
-const npm    = utils.getNpm();
+const npm    = utils.getGlobalNpm();
 const modulesNeedInstalling = [];
 const promises = [];
 
