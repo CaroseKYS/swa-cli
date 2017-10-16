@@ -28,7 +28,8 @@
     "mkdirp": "~0",
     "tar": "~2",
     "fstream": "~1",
-    "opn": "~5"
+    "opn": "~5",
+    "swa-utils": "latest"
   },
   "devDependencies": {
     "mocha": "~2.5.2",
